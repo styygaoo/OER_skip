@@ -39,7 +39,6 @@ class GuideDepth(nn.Module):
                                    guide_features=3,
                                    guidance_type="full")
 
-
     def forward(self, x):
         y = self.feature_extractor(x)
 
@@ -50,23 +49,23 @@ class GuideDepth(nn.Module):
 
         # features = y                    # before up1    p3
         copy = y                        #
+        print(copy.shape)               # torch.Size([4, 64, 48, 160])
+
+        # modify the dimension of copy to let it combined with the tensor features line 68
+        if True:
+            down = nn.Conv2d(64,16,kernel_size=1).cuda()
+            copy = down(copy)           #torch.Size([4, 16, 48, 160])
+        copy = F.interpolate(copy, scale_factor=4, mode='bilinear')     #torch.Size([4, 16, 192, 640])
 
         y = self.up_1(x_quarter, y)
-
         y = F.interpolate(y, scale_factor=2, mode='bilinear')
-
-        # features = y                    # before up2    p2
-
 
         y = self.up_2(x_half, y)
-
-
-        y = F.interpolate(y, scale_factor=2, mode='bilinear')
-
+        y = F.interpolate(y, scale_factor=2, mode='bilinear')           # y -> ([4, 16, 192, 640])
 
         features = y                    # before up3    p1
-
-        y = y + copy        # add a skip connection from P3 to P1
+        # skip connection
+        y = features + copy        # add a skip connection from P3 to P1
 
         y = self.up_3(x, y)
 

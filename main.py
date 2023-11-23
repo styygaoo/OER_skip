@@ -9,7 +9,6 @@ from torchvision import transforms as T
 import matplotlib.pyplot as plt
 import torch.optim as optim
 import torch.nn as nn
-
 from data_processing import unpack_and_move, inverse_depth_norm, depth_norm
 from config_model_TTA import configure_model, collect_params
 import oer
